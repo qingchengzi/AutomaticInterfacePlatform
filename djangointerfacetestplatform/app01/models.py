@@ -18,6 +18,17 @@ class It(models.Model):
     class Meta:
         ordering = ["-id"]  # 列表中安装id倒序排列
 
+    def fraction_of_coverage(self):
+        """覆盖率"""
+        if self.api_set.count():
+            # 被除数不能为0，通过的用例数量除以用例总数，用例总数是不会为0的
+            result = self.api_set.filter(
+                api_pass_status=1).count() / self.api_set.count() * 100  # api_pass_status字段已通过的是1
+            # 没有执行通过覆盖率就是0.0
+            return "%.2f%%" % result
+        else:
+            return "0.00%"
+
 
 class Api(models.Model):
     """

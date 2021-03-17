@@ -20,5 +20,6 @@ from app01 import views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^$',views.Index.as_view(),name="index"),
+    url(r'^$', views.Index.as_view(), name="index"),
+    url(r'^add_it/$',views.AddItem.as_view(),name="add_it")
 ]
