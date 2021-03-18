@@ -169,7 +169,7 @@ textarea.form-control.is-warning {
   display: block;
 }
 
-.custom-file-input.is-warning:focus ~ .custom-file-label {
+.custom-file-input .is-warning:focus ~ .custom-file-label {
   border-color: #ffc107;
   box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.25);
 }

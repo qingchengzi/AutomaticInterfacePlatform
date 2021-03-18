@@ -20,7 +20,16 @@ from app01 import views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    # index页面
     url(r'^$', views.Index.as_view(), name="index"),
-    url(r'^add_it/$',views.AddItem.as_view(),name="add_it"),
-    url(r'^delete_it(?P<pk>\d+)/$',views.DeleteIt.as_view(),name="delete_it"),
+    # 项目表相关
+    url(r'^index/$', views.Index.as_view(), name="index"),
+    url(r'^add_it/$', views.AddItem.as_view(), name="add_it"),
+    url(r'^delete_it(?P<pk>\d+)/$', views.DeleteIt.as_view(), name="delete_it"),
+    url(r'^edit_it(?P<pk>\d+)/$', views.EditIt.as_view(), name="edit_it"),
+    # excel文件批量上传测试用例
+    url(r'^upload/(?P<pk>\d+)/$', views.UploadFile.as_view(), name="upload"),
+    # 接口用例相关
+    url(r"^list_api/(?P<pk>\d+)/$", views.ListApi.as_view(), name="list_api")
+
 ]

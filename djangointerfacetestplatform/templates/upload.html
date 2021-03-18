@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+    <div class="col-md-7">
+        <!--上传文件页面的提示信息，提示能上传什么类型的文件-->
+        <div class="alert alert-warning alert-dismissible" id="p1">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            <h5><i class="icon fas fa-exclamation-triangle"></i> 重要提示!</h5>
+            <span id="error">
+                这里只能上传Excel文件，Excel表格设计中字段一定要和数据库中字段一致。
+            </span>
+        </div>
+        <!--上传文件功能-->
+        <div class="form-group">
+            <label for="exampleInputFile">文件上传</label>
+            <div class="input-group">
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="ajaxFile">
+                    <label class="custom-file-label" for="exampleInputFile"></label>
+                </div>
+                <div class="input-group-append">
+                    <span class="input-group-text" id="ajaxBtn">上传</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div hidden id="it_obj_pk" >{{ it_obj_pk }}</div> <!--ajax发送请求的时候需要项目的Pk-->
+    {% csrf_token %}
+{% endblock %}
+
+{% block js %}
+    <script src="{% static 'jquery.js' %}"></script>
+    <script>
+        $("#ajaxBtn").click(function () {
+            console.log($("#it_obj_pk").text()); <!--测试打印一下id=it_obj_pk-->
+            // 首先，实例化一个formdata对象
+            var form_obj = new FormData();
+            // 使用formdata的append来添加数据，
+            // 获取文件对象值，组合{"f1":"文件对象值"}字典，views中通过字典f1的key来获取文件名
+            form_obj.append("f1", $("#ajaxFile")[0].files[0]);
+            // 处理csrftoken
+            form_obj.append("csrfmiddlewaretoken", $("[name='csrfmiddlewaretoken']").val());
+            var it_obj_pk = $("#it_obj_pk").text();
+            form_obj.append("it_obj_pk", it_obj_pk);
+            $.ajax({
+                url: "/app01/upload/" + it_obj_pk + "/",
+                type: "post",
+                data: form_obj,
+                processData: false, // 不需要处理数据的编码格式
+                contentType: false, // 不需要处理contentType的请求头
+                success: function (dataMsg) {
+                    if (dataMsg['status'] == 500) {
+                        $("#p1").attr("class","alert alert-danger alert-dismissible");
+                        $("#error").text(dataMsg['errors'])
+                    } else {
+                        window.location.href = dataMsg["path"]
+                    }
+                }
+            })
+        })
+    </script>
+{% endblock %}

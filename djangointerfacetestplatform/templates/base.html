@@ -212,7 +212,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     <div class="col-sm-6">
                         {% block breadcrumb %}
                             <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                                <li class="breadcrumb-item"><a href="{% url "app01:index" %}">首页</a></li>
                                 <li class="breadcrumb-item active">Starter Page</li>
                             </ol>
                         {% endblock %}
@@ -270,6 +270,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <script src="{% static "AdminLTE-master/plugins/bootstrap/js/bootstrap.bundle.min.js" %}"></script>
     <!-- AdminLTE App -->
     <script src="{% static "AdminLTE-master/dist/js/adminlte.min.js" %}"></script>
+    {% block js %}
+
+    {% endblock %}
 
 </body>
 </html>
