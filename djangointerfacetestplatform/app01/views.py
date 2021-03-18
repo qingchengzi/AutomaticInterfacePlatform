@@ -73,3 +73,21 @@ class AddItem(View):
             return redirect(reverse('app01:index'))
         else:
             return render(request, "add_it.html", {"it_form_obj": form_data})
+
+
+class DeleteIt(View):
+    """
+    删除项目,需要传入删除项目的id
+    """
+    def get(self,request,*args,**kwargs):
+        """
+        点击删除后传入项目id进行删除
+        :param request:
+        :param args:
+        :param kwargs: 传入项目id {'pk':项目id}
+        :return:
+        """
+        models.It.objects.filter(pk=kwargs.get('pk')).delete()
+        return redirect(reverse('app01:index'))
+
+

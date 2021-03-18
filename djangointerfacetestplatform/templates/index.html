@@ -40,7 +40,7 @@
                         <!--用例通过的数量除以总用例数量-->
                         <td>{{ foo.fraction_of_coverage }}</td>
                         <td>
-                            <a href="#" class="btn btn-danger btn-sm">删除</a>
+                            <a href="{% url "app01:delete_it" foo.pk %}" class="btn btn-danger btn-sm">删除</a>
                             <a href="" class="btn btn-info btn-sm">编辑</a>
                             <a href="" class="btn btn-warning btn-sm">添加用例</a>
                             <a href="" class="btn btn-default btn-sm">批量导入</a>
