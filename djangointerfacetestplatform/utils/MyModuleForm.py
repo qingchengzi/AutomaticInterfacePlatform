@@ -35,3 +35,20 @@ class ItModelForm(ModelForm):
             "it_start_time": wid.DateInput(attrs={"class": "form-control", "type": "date"}),
             "it_end_time": wid.DateInput(attrs={"class": "form-control", "type": "date"}),
         }
+
+
+class ApiModelForm(ModelForm):
+    """
+    添加用例
+    """
+
+    class Meta:
+        model = models.Api
+        fields = "__all__"
+        exclude = ["api_run_status", "api_run_time", "api_pass_status", "api_report", "api_sub_it"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'
+            field.widget.attrs['placeholder'] = '请输入{0}'.format(field.label, )

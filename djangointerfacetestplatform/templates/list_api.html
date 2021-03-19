@@ -79,17 +79,18 @@
         3、后端处理完毕，返回前端状态
          */
         $("#exeute").click(function () {
-            var chck_value = new Array();
+            var chk_value = new Array();
             $.each($('input[name="checkbox_list"]:checked'), function (index, item) { //遍历将所有选中的值放到数组中
                 console.log(item, index);
                 chk_value.push($(this).val());
             });
-            console.log(1112222, chck_value)
-            if (chck_value.length == 0) {
+            console.log(1112222, chk_value);
+            if (chk_value.length == 0) {
                 swal({
                     "title": "请至少勾选一个用例后再点击执行"
                 })
             } else {
+                console.log(33444,chk_value);
                 // ajax将数组发送后端
                 // 需要序列化,JSON.stringify()前端序列化
                 $.ajax({

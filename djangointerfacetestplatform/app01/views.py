@@ -6,9 +6,12 @@ from django.http import JsonResponse
 from django.db import transaction  # 事物
 
 import xlrd
+import json
 
 from app01 import models
 from utils.MyModuleForm import ItModelForm
+from utils.MyModuleForm import ApiModelForm
+from utils import RequestHandler
 
 
 # Create your views here.
@@ -187,3 +190,65 @@ class ListApi(View):
         api_obj = models.Api.objects.filter(api_sub_it__id=pk)
         it_obj = models.It.objects.filter(pk=pk).first()
         return render(request, "list_api.html", {"api_obj": api_obj, "it_obj": it_obj})
+
+    def post(self, request, *args, **kwargs):
+        ApiModelForm(request.POST)
+        return redirect(reverse("app01:index"))
+
+
+class AddApi(View):
+    """
+    添加测试用例
+    """
+
+    def get(self, request, *args, **kwargs):
+        """
+        处理添加用例的get请求的逻辑
+        :param request:
+        :param args:
+        :param kwargs:所属项目的pk
+        :return:
+        """
+        it_obj = models.It.objects.filter(pk=kwargs.get("pk")).first()
+        api_form_obj = ApiModelForm()
+        return render(request, "add_api.html", {"api_form_obj": api_form_obj, "it_boj": it_obj})
+
+    def post(self, request, *args, **kwargs):
+        """
+        处理添加用例post请求
+        :param request:
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        pk = kwargs.get("pk")
+        it_obj = models.It.objects.filter(pk=pk).first()
+        form_data = ApiModelForm(request.POST)
+        if form_data.is_valid():
+            print(form_data.instance.__dict__)
+            form_data.instance.__dict__['api_sub_it_id'] = pk
+            form_data.save()
+            return redirect(reverse("app01:list_api", args=(pk,)))
+        else:
+            return render(request, "add_api.html", {"api_form_obj": form_data, "it_boj": it_obj})
+
+
+def run_case(request, pk=0):
+    """
+    分别处理单条和多条测试用例执行
+    :param request:
+    :param pk:
+    :return:
+    """
+    if request.is_ajax():  # 批量执行用例
+        chk_value = request.POST.get("chk_value")
+        chk_value = json.loads(chk_value)  # 反序列化为list
+        # 数据库取pk在chk_value记录中对象
+        api_list = models.Api.objects.filter(pk__in=chk_value)
+        RequestHandler.run_case(api_list)
+        # 执行成功后跳转到logs_list
+        return JsonResponse({"path": "/app01/log_list"})
+    else:  # 执行单条测试用例
+        case_obj = models.Api.objects.filter(pk=pk).first()
+        RequestHandler.run_case([case_obj])
+        return redirect(reverse("app01:index"))

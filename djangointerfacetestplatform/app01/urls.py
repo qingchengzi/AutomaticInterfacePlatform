@@ -30,6 +30,9 @@ urlpatterns = [
     # excel文件批量上传测试用例
     url(r'^upload/(?P<pk>\d+)/$', views.UploadFile.as_view(), name="upload"),
     # 接口用例相关
-    url(r"^list_api/(?P<pk>\d+)/$", views.ListApi.as_view(), name="list_api")
+    url(r"^list_api/(?P<pk>\d+)/$", views.ListApi.as_view(), name="list_api"),
+    url(r"^add_api/(?P<pk>\d+)/$", views.AddApi.as_view(), name="add_api"),
+    # 执行用例
+    url(r"^run_case/(?P<pk>\d+)/$", views.run_case, name="run_case")
 
 ]
