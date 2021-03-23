@@ -21,6 +21,10 @@ class Index(View):
     """
     项目默认首页逻辑处理
     """
+    template_name = "index.html"
+
+    def get_context(self):
+        return models.It.get_all()
 
     def get(self, request, *args, **kwargs):
         """
@@ -30,8 +34,7 @@ class Index(View):
         :param kwargs:
         :return:
         """
-        it_obj = models.It.objects.all()
-        return render(request, "index.html", {"it_obj": it_obj})
+        return render(request, self.template_name, {"it_obj": self.get_context()})
 
     def post(self, request, *args, **kwargs):
         """
@@ -48,6 +51,7 @@ class AddItem(View):
     """
     添加项目
     """
+    template_name = "add_it.html"
 
     def get(self, request, *args, **kwargs):
         """
@@ -58,7 +62,7 @@ class AddItem(View):
         :return:
         """
         it_form_obj = ItModelForm()
-        return render(request, "add_it.html", {"it_form_obj": it_form_obj})
+        return render(request, self.template_name, {"it_form_obj": it_form_obj})
 
     def post(self, request, *args, **kwargs):
         """
@@ -73,7 +77,7 @@ class AddItem(View):
             form_data.save()
             return redirect(reverse('app01:index'))
         else:
-            return render(request, "add_it.html", {"it_form_obj": form_data})
+            return render(request, self.template_name, {"it_form_obj": form_data})
 
 
 class DeleteIt(View):
@@ -93,10 +97,33 @@ class DeleteIt(View):
         return redirect(reverse('app01:index'))
 
 
+class DeleteApi(View):
+    """
+    删除用例
+    """
+
+    def get(self, request, *args, **kwargs):
+        """
+        删除用例时，pk是用例的pk
+        由于返回时，需要项目的pk值，这里还不能直接删除
+        :param request:
+        :param args:
+        :param kwargs: 用例的pk
+        :return:
+        """
+        # 用例是不能直接删除，因为删除用例后需要返回用例列表，这个时候需要用例的pk
+        api_obj = models.Api.objects.filter(pk=kwargs.get("pk")).first()
+        # 获取所属项目的PK
+        it_obj_pk = api_obj.api_sub_it_id
+        api_obj.delete()
+        return redirect(reverse("app01:list_api", kwargs={"pk": it_obj_pk}))
+
+
 class EditIt(View):
     """
     编辑项目,需要传入项目id
     """
+    template_name = "edit_it.html"
 
     def get(self, request, *args, **kwargs):
         """
@@ -108,7 +135,7 @@ class EditIt(View):
         """
         it_obj = models.It.objects.filter(pk=kwargs.get("pk")).first()
         it_form_obj = ItModelForm(instance=it_obj)  # 编辑的时候先需要从数据库中取出数据，然后去渲染
-        return render(request, "edit_it.html", {"it_form_obj": it_form_obj})
+        return render(request, self.template_name, {"it_form_obj": it_form_obj})
 
     def post(self, request, *args, **kwargs):
         """
@@ -124,17 +151,18 @@ class EditIt(View):
             form_data.save()
             return redirect(reverse("app01:index"))
         else:
-            return render(request, "edit_it.html", {"it_form": form_data})
+            return render(request, self.template_name, {"it_form": form_data})
 
 
 class UploadFile(View):
     """
     通过Excel文件，批量上传测试用例
     """
+    template_name = "upload.html"
 
     def get(self, request, *args, **kwargs):
         pk = kwargs.get("pk")
-        return render(request, "upload.html", {"it_obj_pk": pk})
+        return render(request, self.template_name, {"it_obj_pk": pk})
 
     def post(self, request, *args, **kwargs):
         pk = kwargs.get("pk")
@@ -170,13 +198,14 @@ class UploadFile(View):
                     "it_obj_pk": pk,
                     "errors": "只能上传xls和xlsx文件类型,并且表格的字段要符合要求，错误详情:{0}".format(error)
                 })
-        return render(request, "upload.html", {"it_obj_pk": pk})
+        return render(request, self.template_name, {"it_obj_pk": pk})
 
 
 class ListApi(View):
     """
     需要传入项目pk，因为用例属于项目
     """
+    template_name = "list_api.html"
 
     def get(self, request, *args, **kwargs):
         """
@@ -189,7 +218,7 @@ class ListApi(View):
         pk = kwargs.get("pk")
         api_obj = models.Api.objects.filter(api_sub_it__id=pk)
         it_obj = models.It.objects.filter(pk=pk).first()
-        return render(request, "list_api.html", {"api_obj": api_obj, "it_obj": it_obj})
+        return render(request, self.template_name, {"api_obj": api_obj, "it_obj": it_obj})
 
     def post(self, request, *args, **kwargs):
         ApiModelForm(request.POST)
@@ -200,6 +229,7 @@ class AddApi(View):
     """
     添加测试用例
     """
+    template_name = "add_api.html"
 
     def get(self, request, *args, **kwargs):
         """
@@ -211,7 +241,7 @@ class AddApi(View):
         """
         it_obj = models.It.objects.filter(pk=kwargs.get("pk")).first()
         api_form_obj = ApiModelForm()
-        return render(request, "add_api.html", {"api_form_obj": api_form_obj, "it_boj": it_obj})
+        return render(request, self.template_name, {"api_form_obj": api_form_obj, "it_boj": it_obj})
 
     def post(self, request, *args, **kwargs):
         """
@@ -230,7 +260,7 @@ class AddApi(View):
             form_data.save()
             return redirect(reverse("app01:list_api", args=(pk,)))
         else:
-            return render(request, "add_api.html", {"api_form_obj": form_data, "it_boj": it_obj})
+            return render(request, self.template_name, {"api_form_obj": form_data, "it_boj": it_obj})
 
 
 def run_case(request, pk=0):
@@ -240,9 +270,11 @@ def run_case(request, pk=0):
     :param pk:
     :return:
     """
-    if request.is_ajax():  # 批量执行用例
+    # 批量执行用例
+    if request.is_ajax():
         chk_value = request.POST.get("chk_value")
-        chk_value = json.loads(chk_value)  # 反序列化为list
+        # 反序列化为list
+        chk_value = json.loads(chk_value)
         # 数据库取pk在chk_value记录中对象
         api_list = models.Api.objects.filter(pk__in=chk_value)
         RequestHandler.run_case(api_list)

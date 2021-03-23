@@ -5,7 +5,7 @@
 {% block breadcrumb %}
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{% url 'app01:index' %}">首页</a></li>
-        <li class="breadcrumb-item active">{{ it_obj.it_name }}</li>
+        <li class="breadcrumb-item"><a href="{% url 'app01:index' %}">{{ it_obj.it_name }}</a></li>
         <li class="breadcrumb-item active">用例列表</li>
     </ol>
 
@@ -13,7 +13,7 @@
 
 {% block content %}
     {% if api_obj %}
-        <table class="table table-striped table-hover table-bordered">
+        <table class="table table-striped table-hover table-bordered" style="text-align: center">
             <thead style="text-align: center">
             <tr>
                 <th>选择</th>
@@ -35,8 +35,8 @@
                 <tr>
                     <td><input type="checkbox" value="{{ foo.pk }}" name="checkbox_list"></td>
                     <td>{{ forloop.counter }}</td>
-                    <td>{{ foo.api_name }}</td>
-                    <td title="{{ foo.api_desc }}">{{ foo.api_desc | truncatechars:"25" }}</td>
+                    <td>{{ foo.api_name | truncatechars:10 }}</td>
+                    <td title="{{ foo.api_desc }}">{{ foo.api_desc | truncatechars:"12" }}</td>
                     <td title="{{ foo.api_url }}">{{ foo.api_url | truncatechars:"15" }}</td>
                     <td>{{ foo.api_method }}</td>
                     <td>{{ foo.api_params }}</td>
@@ -49,7 +49,7 @@
                         <td>无</td>
                     {% endif %}
                     <td>
-                        <a href="#" class="btn btn-danger btn-sm">删除</a>
+                        <a href="{% url 'app01:delete_api' foo.pk %}" class="btn btn-danger btn-sm">删除</a>
                         <a href="#" class="btn btn-info btn-sm">编辑</a>
                         <a href="#" class="btn btn-info btn-sm">执行</a>
                     </td>
@@ -90,7 +90,7 @@
                     "title": "请至少勾选一个用例后再点击执行"
                 })
             } else {
-                console.log(33444,chk_value);
+                console.log(33444, chk_value);
                 // ajax将数组发送后端
                 // 需要序列化,JSON.stringify()前端序列化
                 $.ajax({

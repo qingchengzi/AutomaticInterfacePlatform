@@ -11,12 +11,12 @@
 
 {% block content %}
     {% if it_obj %}
-        <div class="card card-primary card-outline">
+        <div class="card card-primary">
             <div class="col-xs-pull-1">
-                <a href="{% url "app01:add_it" %}" class="btn btn-sm btn-primary">添加项目</a>
+                <a href="{% url "app01:add_it" %}" class="btn  btn-info">添加项目</a>
             </div>
-            <table class="table table-striped table-hover table-bordered">
-                <thead style="text-align: center">
+            <table class="table table-striped table-hover" style="text-align: center">
+                <thead>
                 <tr>
                     <th>序号</th>
                     <th>名称</th>
@@ -32,19 +32,19 @@
                 {% for foo in it_obj %}
                     <tr>
                         <td>{{ forloop.counter }}</td>
-                        <td>{{ foo.it_name }}</td>
-                        <td>{{ foo.it_desc }}</td>
+                        <td>{{ foo.it_name | truncatechars:10 }}</td>
+                        <td>{{ foo.it_desc | truncatechars:15 }}</td>
                         <td>{{ foo.it_start_time }}</td>
                         <td>{{ foo.it_end_time }}</td>
                         <td>{{ foo.api_set.count }}</td>
                         <!--用例通过的数量除以总用例数量-->
                         <td>{{ foo.fraction_of_coverage }}</td>
                         <td>
-                            <a href="{% url "app01:delete_it" foo.pk %}" class="btn btn-danger btn-sm">删除</a>
                             <a href="{% url "app01:edit_it" foo.pk %}" class="btn btn-info btn-sm">编辑</a>
+                            <a href="{% url "app01:list_api" foo.pk %}" class="btn btn-success btn-sm">查看用例</a>
                             <a href="{% url "app01:add_api" foo.pk %}" class="btn btn-warning btn-sm">添加用例</a>
                             <a href="{% url "app01:upload" foo.pk %}" class="btn btn-default btn-sm">批量导入</a>
-                            <a href="{% url "app01:list_api" foo.pk %}" class="btn btn-success btn-sm">查看用例</a>
+                            <a href="{% url "app01:delete_it" foo.pk %}" class="btn btn-danger btn-sm">删除</a>
                         </td>
                     </tr>
 
@@ -54,7 +54,7 @@
 
         </div>
     {% else %}
-        <p>没有数据，去<a href="">创建项目</a></p>
+        <p>没有项目，立即&nbsp<a href="{% url 'app01:add_it' %}">创建项目</a></p>
     {% endif %}
 
 {% endblock %}

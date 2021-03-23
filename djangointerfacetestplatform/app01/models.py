@@ -29,6 +29,10 @@ class It(models.Model):
         else:
             return "0.00%"
 
+    @classmethod
+    def get_all(cls):
+        return cls.objects.all()
+
 
 class Api(models.Model):
     """
