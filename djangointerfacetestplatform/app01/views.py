@@ -3,7 +3,11 @@ from django.shortcuts import redirect
 from django.shortcuts import reverse
 from django.views import View
 from django.http import JsonResponse
+from django.http import HttpResponse
 from django.db import transaction  # 事物
+# 下载文件
+from django.http import FileResponse
+from django.utils.encoding import escape_uri_path
 
 import xlrd
 import json
@@ -130,11 +134,12 @@ class EditIt(View):
         处理get请求，需要将编辑项目的内容获取且填充到对应的文本框中
         :param request:
         :param args:
-        :param kwargs:
+        :param kwargs:pk是项目的pk
         :return:
         """
         it_obj = models.It.objects.filter(pk=kwargs.get("pk")).first()
-        it_form_obj = ItModelForm(instance=it_obj)  # 编辑的时候先需要从数据库中取出数据，然后去渲染
+        # 编辑的时候先需要从数据库中取出数据，然后去渲染
+        it_form_obj = ItModelForm(instance=it_obj)
         return render(request, self.template_name, {"it_form_obj": it_form_obj})
 
     def post(self, request, *args, **kwargs):
@@ -145,13 +150,54 @@ class EditIt(View):
         :param kwargs:
         :return:
         """
-        it_obj = models.It.objects.filter(pk=kwargs.get("pk")).first()
-        form_data = ItModelForm(request.POST, instance=it_obj)
+        it_form_obj = models.It.objects.filter(pk=kwargs.get("pk")).first()
+        form_data = ItModelForm(request.POST, instance=it_form_obj)
         if form_data.is_valid():
             form_data.save()
             return redirect(reverse("app01:index"))
         else:
-            return render(request, self.template_name, {"it_form": form_data})
+            return render(request, self.template_name, {"it_form_obj": form_data})
+
+
+class EditApi(View):
+    """
+    编辑测试用例,需要传入用例的pk
+    """
+    template_name = "edit_api.html"
+
+    def get(self, request, *args, **kwargs):
+        """
+        处理get请求,需要将编辑用例的内容获取且填充到对应的文本框中
+        :param request:
+        :param args:
+        :param kwargs:需要编辑用例的pk
+        :return:
+        """
+        api_obj = models.Api.objects.filter(pk=kwargs.get("pk")).first()
+        # 编辑的时候先需要从数据库中取出数据，然后去渲染
+        api_form_obj = ApiModelForm(instance=api_obj)
+        return render(request, self.template_name, {"api_form_obj": api_form_obj, "it_obj": api_obj.api_sub_it})
+
+    def post(self, request, *args, **kwargs):
+        """
+        编辑用例
+        :param request:
+        :param args:
+        :param kwargs:需要编辑用例的pk
+        :return:
+        """
+        api_obj = models.Api.objects.filter(pk=kwargs.get("pk")).first()
+        form_data = ApiModelForm(request.POST, instance=api_obj)
+        if form_data.is_valid():
+            # 测试用例进行编辑后，需要将是否通过，是否执行，测试报告重置为初始状态
+            form_data.instance.__dict__["api_pass_status"] = 0
+            form_data.instance.__dict__["api_run_status"] = 0
+            form_data.instance.__dict__["api_report"] = ""
+            form_data.save()
+            # 返回需要传该用例所属项目的pk值回去
+            return redirect(reverse("app01:list_api", kwargs={"pk": api_obj.api_sub_it_id}))
+        else:
+            return render(request, self.template_name, {"api_form_obj": form_data, "it_obj": api_obj.api_sub_it})
 
 
 class UploadFile(View):
@@ -279,8 +325,57 @@ def run_case(request, pk=0):
         api_list = models.Api.objects.filter(pk__in=chk_value)
         RequestHandler.run_case(api_list)
         # 执行成功后跳转到logs_list
-        return JsonResponse({"path": "/app01/log_list"})
+        return JsonResponse({"path": "/app01/logs_list"})
     else:  # 执行单条测试用例
         case_obj = models.Api.objects.filter(pk=pk).first()
         RequestHandler.run_case([case_obj])
-        return redirect(reverse("app01:index"))
+        return redirect(reverse("app01:logs_list"))
+
+
+def logs_list(request):
+    """
+    log日志主页
+    :param request:
+    :return:
+    """
+    if request.method == "POST":
+        return HttpResponse("ok")
+    else:
+        logs_obj = models.Logs.objects.all()
+        return render(request, "log_list.html", {"logs_obj": logs_obj})
+
+
+def preview(request, pk):
+    """
+    测试报告预览，pk是logs记录中的pk
+    :param request:
+    :param pk: log表中的pk
+    :return:
+    """
+    if request.method == "POST":
+        resport_pk = request.POST.get("report_pk")
+        log_obj = models.Logs.objects.filter(pk=resport_pk).first()
+        # 下载
+        response = FileResponse(log_obj.log_report)
+        response['Content-Type'] = 'application/octet-stream'
+        response['Content-Disposition'] = 'attachment;filename="{0}.{1}"'.format(
+            escape_uri_path(log_obj.log_sub_it.it_name),
+            "html")
+        return response
+    log_obj = models.Logs.objects.filter(pk=pk).first()
+    return render(request, "preview.html", {"log_obj": log_obj})
+
+
+def download_case_report(request, pk):
+    """
+    下载单个用例的执行报告，pk是用例的pk
+    :param request:
+    :param pk:
+    :return:
+    """
+    api_obj = models.Api.objects.filter(pk=pk).first()
+    # 下载
+    response = FileResponse(api_obj.api_report)
+    response['Content-Type'] = 'application/octet-stream'
+    response['Content-Disposition'] = 'attachment;filename="{0}.{1}"'.format(escape_uri_path(api_obj.api_name), "html")
+    return response

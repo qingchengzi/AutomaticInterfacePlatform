@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+    <div class="card card-primary">
+        <div class="card-header">
+            <h3 class="card-title">[{{ log_obj.log_sub_it.it_name }}]的记录报告</h3>
+            <div class="card-tools">
+                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-tool" data-card-widget="remove">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="chart">
+                <div style="min-height: 250px; height: 100%; max-height: 850px; max-width: 100%;">
+                    {{ log_obj.log_report | safe}}
+                </div>
+            </div>
+            <div>
+                <form action="" method="post">
+                    {% csrf_token %}
+                    <input type="text" name="report_pk" value="{{ log_obj.pk }}" hidden>
+                    <button class="btn btn-default"><a href="{% url 'app01:logs_list' %}">返回上一页</a></button>
+                    <input type="submit" class="btn btn-success" value="下载报告" />
+                </form>
+            </div>
+
+        </div>
+        <!-- /.card-body -->
+    </div>
+{% endblock %}

@@ -239,7 +239,8 @@ html.maximized-card {
 
 .card-title {
   float: left;
-  font-size: $card-title-font-size;
+  //font-size: $card-title-font-size;
+  font-size: 2.0rem;
   font-weight: $card-title-font-weight;
   margin: 0;
 }

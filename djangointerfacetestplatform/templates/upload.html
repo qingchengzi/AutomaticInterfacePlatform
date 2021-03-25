@@ -1,5 +1,12 @@
 {% extends "base.html" %}
 {% load static %}
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url "app01:index" %}">首页</a></li>
+        <li class="breadcrumb-item active">上传用例</li>
+    </ol>
+{% endblock %}
+
 
 {% block content %}
     <div class="col-md-7">
@@ -26,7 +33,7 @@
         </div>
 
     </div>
-    <div hidden id="it_obj_pk" >{{ it_obj_pk }}</div> <!--ajax发送请求的时候需要项目的Pk-->
+    <div hidden id="it_obj_pk">{{ it_obj_pk }}</div> <!--ajax发送请求的时候需要项目的Pk-->
     {% csrf_token %}
 {% endblock %}
 
@@ -52,7 +59,7 @@
                 contentType: false, // 不需要处理contentType的请求头
                 success: function (dataMsg) {
                     if (dataMsg['status'] == 500) {
-                        $("#p1").attr("class","alert alert-danger alert-dismissible");
+                        $("#p1").attr("class", "alert alert-danger alert-dismissible");
                         $("#error").text(dataMsg['errors'])
                     } else {
                         window.location.href = dataMsg["path"]

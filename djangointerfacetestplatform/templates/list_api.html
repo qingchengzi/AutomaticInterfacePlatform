@@ -44,14 +44,14 @@
                     <td>{{ foo.get_api_pass_status_display }}</td>
                     <td>{{ foo.get_api_run_status_display }}</td>
                     {% if foo.api_report %}
-                        <td><a href="#">下载</a></td>
+                        <td><a href="{% url "app01:download_case_report" foo.pk %}">下载</a></td>
                     {% else %}
                         <td>无</td>
                     {% endif %}
                     <td>
                         <a href="{% url 'app01:delete_api' foo.pk %}" class="btn btn-danger btn-sm">删除</a>
-                        <a href="#" class="btn btn-info btn-sm">编辑</a>
-                        <a href="#" class="btn btn-info btn-sm">执行</a>
+                        <a href="{% url 'app01:edit_api' foo.pk %}" class="btn btn-info btn-sm">编辑</a>
+                        <a href="{% url 'app01:run_case' foo.pk %}" class="btn btn-info btn-sm">执行</a>
                     </td>
                 </tr>
             {% endfor %}
@@ -101,7 +101,7 @@
                         "csrfmiddlewaretoken": $("[name='csrfmiddlewaretoken']").val()
                     },
                     success: function (data) {
-                        //console.log(data)
+                        //console.log(data);
                         window.location = data["path"]
                     }
                 })

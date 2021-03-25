@@ -37,6 +37,15 @@ urlpatterns = [
     # 执行用例
     url(r"^run_case/(?P<pk>\d+)/$", views.run_case, name="run_case"),
     # 删除用例
-    url(r"delete_api/(?P<pk>\d+)/$", views.DeleteApi.as_view(), name="delete_api")
+    url(r"^delete_api/(?P<pk>\d+)/$", views.DeleteApi.as_view(), name="delete_api"),
+    # 编辑用例
+    url(r"^edit_api/(?P<pk>\d+)/$", views.EditApi.as_view(), name="edit_api"),
+
+    # log日志
+    url(r"^logs_list/$", views.logs_list, name="logs_list"),
+    # 预览
+    url(r"^preview/(?P<pk>\d+)/$", views.preview, name="preview"),
+    # 下载测试报告
+    url(r"^download_case_report/(?P<pk>\d+)/$", views.download_case_report, name="download_case_report"),
 
 ]

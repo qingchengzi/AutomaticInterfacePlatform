@@ -31,9 +31,8 @@ class MyCase(unittest.TestCase):
     """
 
     def test_case(self):
-        print("有没有进入啊:desc", self.desc)
         self._testMethodDoc = self.desc  # 定义用例描述
-        self.assertEqual(DeepDiff(self.response, self.expect).get("values_changes", None), None, msg=self.msg)
+        self.assertEqual(DeepDiff(self.response, self.expect).get("values_changed", None), None, msg=self.msg)
 
 
 class RequestOperate:
@@ -82,11 +81,14 @@ class RequestOperate:
         case.response = response
         case.expect = self._check_expect()
         case.msg = "自定义的错误信息:{0}".format(DeepDiff(response, self._check_expect()))
-        case.title = self.case_obj.api_name  # 测试报告中显示用例名字
-        case.desc = self.case_obj.api_desc  # 测试报告中显示用例的描述
-
-        self.suite_list.addTest(case)  # 添加到我们的self.suite_list
-        suite = unittest.TestSuite()  # 当前用例的suite
+        # 定义测试报告中显示用例名字
+        case.title = self.case_obj.api_name
+        # 定义测试报告中显示用例的描述
+        case.desc = self.case_obj.api_desc
+        # 批量执行用例时将每个用例执行结果添加到self.suite_list列表中生成测试报告
+        self.suite_list.addTest(case)
+        # 对每个用例生成单独测试报告
+        suite = unittest.TestSuite()
         suite.addTest(case)
         self.create_single_report(suite)
 
@@ -99,8 +101,9 @@ class RequestOperate:
         f = BytesIO()
         result = HTMLTestRunner(
             stream=f,
-            title=self.case_obj.api_name,
-            description=self.case_obj.api_desc,
+            verbosity=2,
+            title="测试用例01",
+            description="用例的描述"
         ).run(suite)
         self.update_api_status(result, f)
 
@@ -114,7 +117,7 @@ class RequestOperate:
         # print("多个测试用例的报告", suite)
         result = HTMLTestRunner(
             stream=f,
-            # verbosity=2,
+            verbosity=2,
             title=self.case_obj.api_name,
             description=self.case_obj.api_desc,
         ).run(suite)
@@ -154,14 +157,16 @@ class RequestOperate:
         obj.api_report = f.getvalue()
         # 写执行时间
         obj.api_run_time = datetime.datetime.now()
-        # 是否执行用例
+        # 修改用例执行状态
         obj.api_run_status = 1
-        # 写api_pass_status 通过状态
+        # 用例是否通过状态判断
         for i in result.__dict__['result']:
-            if i[0]:  # i[0] = 0 用例执行通过,i[0] = 1 失败
-                obj.api_pass_status = 0
-            else:
+            if i[0] == 0:
+                # 修改用例是否执行通过状态，1为已通过
                 obj.api_pass_status = 1
+            else:
+                # 用例状态，0为未通过
+                obj.api_pass_status = 0
         obj.save()
 
     def _check_expect(self):
@@ -188,7 +193,7 @@ class RequestOperate:
     def _check_params(self):
         """
         校验请求的params参数
-        默认：数据库中的data字段是标准的json串
+        默认：数据库中的params字段是标准的json串
         :return:
         """
         if self.case_obj.api_params:

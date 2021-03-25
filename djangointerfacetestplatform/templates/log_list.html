@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'app01:index' %}">首页</a></li>
+        <li class="breadcrumb-item accent">log列表</li>
+    </ol>
+{% endblock %}
+
+{% block content %}
+    <table class="table table-striped table-hover table-bordered" style="text-align: center">
+        <thead style="text-align: center">
+        <tr>
+            <th>序号</th>
+            <th>所属项目</th>
+            <th>创建时间</th>
+            <th>用例总数</th>
+            <th>用例失败数</th>
+            <th>用例报错数</th>
+            <th>用例通过数</th>
+            <th>通过率</th>
+            <th>用例报告</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for foo in logs_obj %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ foo.log_sub_it.it_name }}</td>
+                <td>{{ foo.log_run_time }}</td>
+                <td>{{ foo.log_run_count }}</td>
+                <td>{{ foo.log_failed_count }}</td>
+                <td>{{ foo.log_error_count}}</td>
+                <td>{{ foo.log_pass_count }}</td>
+                <td>{{ foo.pass_rate}}</td>
+                <td><a href="{% url 'app01:preview' foo.pk %}">预览</a></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

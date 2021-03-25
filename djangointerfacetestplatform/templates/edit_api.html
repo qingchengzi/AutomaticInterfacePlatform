@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'app01:index' %}">首页</a></li>
+        <li class="breadcrumb-item active">{{ it_obj.it_name }}</li>
+        <li class="breadcrumb-item active">添加用例</li>
+    </ol>
+{% endblock %}
+
+{% block content %}
+     <form action="" method="post" novalidate>
+        {% csrf_token %}
+        {% for foo in api_form_obj %}
+            <div>
+                <label for="{{ foo.id_for_label }}">{{ foo.label }}</label>
+                {{ foo }}
+                <span style="color:red">{{ foo.errors.0 }}</span>
+            </div>
+        {% endfor %}
+        <input type="submit" class="btn btn-success" value="提交">
+    </form>
+{% endblock %}

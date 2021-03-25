@@ -83,5 +83,19 @@ class Logs(models.Model):
     log_error_count = models.IntegerField(verbose_name="报错数量")
     log_run_count = models.IntegerField(verbose_name="执行用例总数")
 
+    def pass_rate(self):
+        """
+        通过率 = 通过的用例 / 总用例
+        :return:
+        """
+        if self.log_run_count:
+            result = self.log_pass_count / self.log_run_count * 100
+            if result:
+                return "%.f%%" % (result)
+            else:
+                return 0
+        else:
+            return 0
+
     class Meta:
         ordering = ['-log_run_time']
