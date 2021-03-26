@@ -47,5 +47,10 @@ urlpatterns = [
     url(r"^preview/(?P<pk>\d+)/$", views.preview, name="preview"),
     # 下载测试报告
     url(r"^download_case_report/(?P<pk>\d+)/$", views.download_case_report, name="download_case_report"),
+    # 可视化
+    url(r"show_table/$",views.show_tab,name="show_tab",),
+    # 发送邮件
+    url(r'^send_email/', views.send_email, name="send_email"),
+
 
 ]

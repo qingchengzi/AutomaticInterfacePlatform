@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item accent">可视化图表</li>
+    </ol>
+{% endblock %}
+
+
+{% block content %}
+    <div class="card card-primary">
+        <div class="card-header">
+            <h3 class="card-title">最近一年用例情况</h3>
+
+            <div class="card-tools">
+                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-tool" data-card-widget="remove">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="chart">
+                <div id="LineSimple"
+                     style="min-height: 250px; height: 400px; max-height: 450px; max-width: 100%;"></div>
+            </div>
+        </div>
+        <!-- /.card-body -->
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card card-primary">
+                <div class="card-header">
+                    <h3 class="card-title">用例执行情况统计</h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <button type="button" class="btn btn-tool" data-card-widget="remove">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chart">
+                        <div id="PassChart"
+                             style="min-height: 250px; height: 400px; max-height: 450px; max-width: 100%;"></div>
+                    </div>
+
+                </div>
+                <!-- /.card-body -->
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card card-primary">
+                <div class="card-header">
+                    <h3 class="card-title">用例通过情况统计</h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <button type="button" class="btn btn-tool" data-card-widget="remove">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chart">
+                        <div id="ExecuteChart"
+                             style="min-height: 250px; height: 400px; max-height: 450px; max-width: 100%;"></div>
+                    </div>
+
+                </div>
+                <!-- /.card-body -->
+            </div>
+        </div>
+    </div>
+    {% csrf_token %}
+{% endblock %}
+
+
+{% block js %}
+    <script src="{% static 'echarts.min.js' %}"></script>
+    <script>
+        // 用例通过和未通过的饼图
+        function PassPie(title, data) {
+            // 1.实例化echarts对象
+            PieObj = echarts.init(document.getElementById("PassChart"));
+            //  2.配置参数
+            PieObjoption = {
+                title: {
+                    text: '接口测试用例通过',
+                    subtext: '测试用例饼图',
+                    left: 'center'
+                },
+                tooltip: {
+                    trigger: 'item'
+                },
+                legend: {
+                    orient: 'vertical',
+                    left: 'left',
+                    data: title,
+                },
+                series: [
+                    {
+                        name: '用例',
+                        type: 'pie',
+                        radius: '50%',
+                        data: data,
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }
+                ]
+            };
+            // 3.setoption方法，根据配置来生成
+            PieObj.setOption(PieObjoption)
+        };
+
+        // 用例执行和未执行的饼图
+        function ExecutePie(title, data) {
+            // 1.实例化echarts对象
+            PieObj = echarts.init(document.getElementById("ExecuteChart"));
+            //  2.配置参数
+            PieObjoption = {
+                title: {
+                    text: '接口测试用例通过',
+                    subtext: '测试用例饼图',
+                    left: 'center'
+                },
+                tooltip: {
+                    trigger: 'item'
+                },
+                legend: {
+                    orient: 'vertical',
+                    left: 'left',
+                    data: title,
+                },
+                series: [
+                    {
+                        name: '用例',
+                        type: 'pie',
+                        radius: '50%',
+                        data: data,
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }
+                ]
+            };
+            // 3.setoption方法，根据配置来生成
+            PieObj.setOption(PieObjoption)
+        };
+
+        // 近一年来，每月的用例数量走势图，折线图
+        function LineSimple(title, data) {
+            // 1.实例化echarts对象
+            var lineSimple = echarts.init(document.getElementById("LineSimple"));
+            // 2.配置数据和参数
+
+            // 更好看的折线图2
+            lineSimpleOption = {
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: title,
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [{
+                    data: data,
+                    type: 'line',
+                    areaStyle: {}
+                }]
+            };
+
+            /*折线图1
+            lineSimpleOption = {
+                xAxis: {
+                    type: 'category',
+                    data: title
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [{
+                    data: data,
+                    type: 'line'
+                }]
+            };
+            */
+
+            //3.展示图标
+            lineSimple.setOption(lineSimpleOption);
+        }
+
+        function init() {
+            $.ajax({
+                "url": "{% url 'app01:show_tab' %}",
+                "type": "POST",
+                "data": {"csrfmiddlewaretoken": $("[name='csrfmiddlewaretoken']").val()},
+                success: function (data) {
+                    //用例通过和未通过的饼图
+                    PassPie(data['pass_pie']['title'], data['pass_pie']['data']);
+                    // 用例执行/未执行的饼图
+                    ExecutePie(data['execute_pie']['title'], data['execute_pie']['data']);
+                    //用例折线图
+                    LineSimple(data['line_simple']['title'], data['line_simple']['data']);
+                }
+            })
+        }
+
+        init()
+    </script>
+
+{% endblock %}

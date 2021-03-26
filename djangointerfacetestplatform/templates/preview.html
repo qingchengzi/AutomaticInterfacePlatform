@@ -1,5 +1,13 @@
 {% extends "base.html" %}
 
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'app01:logs_list' %}">log日志</a></li>
+        <li class="breadcrumb-item accent">报告</li>
+    </ol>
+{% endblock %}
+
+
 
 {% block content %}
     <div class="card card-primary">

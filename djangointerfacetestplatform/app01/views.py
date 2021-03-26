@@ -4,7 +4,8 @@ from django.shortcuts import reverse
 from django.views import View
 from django.http import JsonResponse
 from django.http import HttpResponse
-from django.db import transaction  # 事物
+# 事物
+from django.db import transaction
 # 下载文件
 from django.http import FileResponse
 from django.utils.encoding import escape_uri_path
@@ -16,6 +17,11 @@ from app01 import models
 from utils.MyModuleForm import ItModelForm
 from utils.MyModuleForm import ApiModelForm
 from utils import RequestHandler
+# 可视化
+from utils.ShowTabHandler import ShowTabOpt
+# 发送邮件
+from django.shortcuts import render,HttpResponse
+from django.core.mail import EmailMessage
 
 
 # Create your views here.
@@ -379,3 +385,36 @@ def download_case_report(request, pk):
     response['Content-Type'] = 'application/octet-stream'
     response['Content-Disposition'] = 'attachment;filename="{0}.{1}"'.format(escape_uri_path(api_obj.api_name), "html")
     return response
+
+
+def show_tab(request):
+    """
+    可视化
+    :param request:
+    :return:
+    """
+    if request.is_ajax():
+        tab_obj = ShowTabOpt()
+        data_dict = {}
+        data_dict.update(tab_obj.pie())
+        data_dict.update(tab_obj.line_simple())
+        return JsonResponse(data_dict)
+    else:
+        return render(request,"show_tab.html")
+
+
+def send_email(request):
+    """
+    发送带附件的邮件
+    :param request:
+    :return:
+    """
+    msg = EmailMessage(
+        subject='这是带附件的邮件标题',
+        body='这是带附件的邮件内容',
+        from_email='tian@163.com',  # 也可以从settings中获取
+        to=['1206180814@qq.com']
+    )
+    msg.attach_file('t2.xls')
+    msg.send(fail_silently=False)
+    return HttpResponse('OK')
