@@ -51,6 +51,8 @@ urlpatterns = [
     url(r"show_table/$",views.show_tab,name="show_tab",),
     # 发送邮件
     url(r'^send_email/', views.send_email, name="send_email"),
+    # 搜索功能
+    url(r'^search/', views.Search.as_view(), name="search"),
 
 
 ]

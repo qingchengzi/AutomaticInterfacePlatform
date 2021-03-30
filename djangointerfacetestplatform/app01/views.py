@@ -20,7 +20,7 @@ from utils import RequestHandler
 # 可视化
 from utils.ShowTabHandler import ShowTabOpt
 # 发送邮件
-from django.shortcuts import render,HttpResponse
+from django.shortcuts import render, HttpResponse
 from django.core.mail import EmailMessage
 
 
@@ -315,6 +315,24 @@ class AddApi(View):
             return render(request, self.template_name, {"api_form_obj": form_data, "it_boj": it_obj})
 
 
+class Search(View):
+    """
+    搜索功能
+    """
+    template_name = "index.html"
+
+    def get_context(self):
+        return models.It.get_all()
+
+    def get(self, request, *args, **kwargs):
+        query = request.GET.get("query")
+        if not query:
+            return render(request, self.template_name, {"it_obj": self.get_context()})
+        it_list = models.It.objects.filter(it_name__icontains="{0}".format(query))
+        print(it_list)
+        return render(request, self.template_name, {"it_obj": it_list})
+
+
 def run_case(request, pk=0):
     """
     分别处理单条和多条测试用例执行
@@ -400,7 +418,7 @@ def show_tab(request):
         data_dict.update(tab_obj.line_simple())
         return JsonResponse(data_dict)
     else:
-        return render(request,"show_tab.html")
+        return render(request, "show_tab.html")
 
 
 def send_email(request):

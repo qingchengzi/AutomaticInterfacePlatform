@@ -9,16 +9,18 @@
 {% endblock %}
 
 {% block content %}
-    <form action="" method="post" novalidate>
-        {% csrf_token %}
-        {% for foo in api_form_obj %}
-            <div>
-                <label for="{{ foo.id_for_label }}">{{ foo.label }}</label>
-                {{ foo }}
-                <span style="color:red">{{ foo.errors.0 }}</span>
-            </div>
-        {% endfor %}
-        <input type="submit" class="btn btn-success" value="提交">
-    </form>
+    <div class="col-lg-6">
+        <form action="" method="post" novalidate>
+            {% csrf_token %}
+            {% for foo in api_form_obj %}
+                <div>
+                    <label for="{{ foo.id_for_label }}">{{ foo.label }}</label>
+                    {{ foo }}
+                    <span style="color:red">{{ foo.errors.0 }}</span>
+                </div>
+            {% endfor %}
+            <input type="submit" class="btn btn-success" value="提交">
+        </form>
+    </div>
 {% endblock %}
 

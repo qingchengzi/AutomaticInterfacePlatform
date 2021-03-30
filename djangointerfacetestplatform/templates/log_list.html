@@ -30,9 +30,9 @@
                 <td>{{ foo.log_run_time }}</td>
                 <td>{{ foo.log_run_count }}</td>
                 <td>{{ foo.log_failed_count }}</td>
-                <td>{{ foo.log_error_count}}</td>
+                <td>{{ foo.log_error_count }}</td>
                 <td>{{ foo.log_pass_count }}</td>
-                <td>{{ foo.pass_rate}}</td>
+                <td>{{ foo.pass_rate }}</td>
                 <td><a href="{% url 'app01:preview' foo.pk %}">预览</a></td>
             </tr>
         {% endfor %}
